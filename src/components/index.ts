@@ -26,3 +26,4 @@ export { TapTempo } from './TapTempo';
 export { MarkerList } from './MarkerList';
 export { EffectRack } from './EffectRack';
 export { Mixer } from './Mixer';
+export { MasterVolume } from './MasterVolume';
