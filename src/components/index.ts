@@ -20,3 +20,4 @@ export { TimeSignature } from './TimeSignature';
 export { PianoKeyboard } from './PianoKeyboard';
 export { ChordLibrary } from './ChordLibrary';
 export { ScaleLibrary } from './ScaleLibrary';
+export { DrumPatterns } from './DrumPatterns';
