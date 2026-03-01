@@ -36,3 +36,4 @@ export { UserPreset } from './UserPreset';
 export { AutomationLane } from './AutomationLane';
 export { LyricEditor } from './LyricEditor';
 export { VocalMode } from './VocalMode';
+export { PianorollTool } from './PianorollTool';
