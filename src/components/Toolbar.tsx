@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import { useProjectStore } from '../store/projectStore';
+import { Presets } from './Presets';
 
 export function Toolbar() {
   const { isPlaying, setPlaying, project } = useProjectStore();
@@ -61,6 +62,8 @@ export function Toolbar() {
           readOnly
         />
       </div>
+      
+      <Presets />
       
       <div className="flex-1" />
       <span className="text-gray-400 text-sm">{project.name}</span>
