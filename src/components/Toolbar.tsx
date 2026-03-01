@@ -32,6 +32,7 @@ import { MIDILearn } from './MIDILearn';
 import { ExportMenu } from './ExportMenu';
 import { UserPreset } from './UserPreset';
 import { AutomationLane } from './AutomationLane';
+import { LyricEditor } from './LyricEditor';
 
 export function Toolbar() {
   const { isPlaying, setPlaying, project, setProject, undo, redo, canUndo, canRedo } = useProjectStore();
@@ -115,6 +116,7 @@ export function Toolbar() {
       <ExportMenu />
       <UserPreset />
       <AutomationLane />
+      <LyricEditor />
       <button 
         onClick={() => document.getElementById('about-dialog')?.classList.toggle('hidden')}
         className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-white text-sm ml-4"
