@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
-import { Toolbar, TrackList, PianoRoll, NoteProperties } from "./components";
+import { Toolbar, TrackList, PianoRoll, NoteProperties, Timeline } from "./components";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 import "./App.css";
 
@@ -11,7 +11,6 @@ function App() {
     invoke<string>("get_version").then(setVersion).catch(console.error);
   }, []);
   
-  // Enable keyboard shortcuts
   useKeyboardShortcuts();
   
   return (
@@ -20,13 +19,14 @@ function App() {
         <span className="text-sm font-medium">Resonance {version && `v${version}`}</span>
       </div>
       <Toolbar />
+      <Timeline />
       <div className="flex-1 flex overflow-hidden">
         <TrackList />
         <PianoRoll />
         <NoteProperties />
       </div>
       <div className="flex items-center justify-between px-4 py-1 bg-gray-800 border-t border-gray-700 text-xs text-gray-400">
-        <span>Ready | Space: Play/Stop | Del: Delete | Esc: Clear</span>
+        <span>Space: Play/Stop | Del: Delete | Esc: Clear</span>
         <span>© 2026 Resonance Team</span>
       </div>
     </div>
