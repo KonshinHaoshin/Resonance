@@ -7,6 +7,7 @@ import { QuantizeSelector } from './QuantizeSelector';
 import { NoteLengthSelector } from './NoteLengthSelector';
 import { OctaveShift } from './OctaveShift';
 import { VelocitySlider } from './VelocitySlider';
+import { Metronome } from './Metronome';
 
 export function Toolbar() {
   const { isPlaying, setPlaying, project, setProject, undo, redo, canUndo, canRedo } = useProjectStore();
@@ -66,6 +67,7 @@ export function Toolbar() {
       <NoteLengthSelector />
       <OctaveShift />
       <VelocitySlider />
+      <Metronome />
       <div className="flex-1" />
       <span className="text-gray-400 text-sm">{project.name}</span>
     </div>

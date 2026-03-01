@@ -9,3 +9,4 @@ export { QuantizeSelector } from './QuantizeSelector';
 export { NoteLengthSelector } from './NoteLengthSelector';
 export { OctaveShift } from './OctaveShift';
 export { VelocitySlider } from './VelocitySlider';
+export { Metronome } from './Metronome';
