@@ -39,3 +39,4 @@ export { VocalMode } from './VocalMode';
 export { PianorollTool } from './PianorollTool';
 export { SnapOptions } from './SnapOptions';
 export { VelocityCurve } from './VelocityCurve';
+export { QuantizeStrength } from './QuantizeStrength';
