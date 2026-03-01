@@ -16,6 +16,7 @@ import { AboutDialog } from './AboutDialog';
 import { PlaybackRate } from './PlaybackRate';
 import { TimeSignature } from './TimeSignature';
 import { PianoKeyboard } from './PianoKeyboard';
+import { ChordLibrary } from './ChordLibrary';
 
 export function Toolbar() {
   const { isPlaying, setPlaying, project, setProject, undo, redo, canUndo, canRedo } = useProjectStore();
@@ -83,6 +84,7 @@ export function Toolbar() {
       <PlaybackRate />
       <TimeSignature />
       <PianoKeyboard />
+      <ChordLibrary />
       <button 
         onClick={() => document.getElementById('about-dialog')?.classList.toggle('hidden')}
         className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 rounded text-white text-sm ml-4"
