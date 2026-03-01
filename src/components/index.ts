@@ -37,3 +37,4 @@ export { AutomationLane } from './AutomationLane';
 export { LyricEditor } from './LyricEditor';
 export { VocalMode } from './VocalMode';
 export { PianorollTool } from './PianorollTool';
+export { SnapOptions } from './SnapOptions';
