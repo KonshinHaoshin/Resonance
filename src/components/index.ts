@@ -25,3 +25,4 @@ export { LoopRegion } from './LoopRegion';
 export { TapTempo } from './TapTempo';
 export { MarkerList } from './MarkerList';
 export { EffectRack } from './EffectRack';
+export { Mixer } from './Mixer';
