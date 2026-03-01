@@ -2,7 +2,6 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 import { useProjectStore } from '../store/projectStore';
 
 const NOTE_HEIGHT = 16;
-const TICK_WIDTH = 0.5;
 const MIN_PITCH = 36;
 const MAX_PITCH = 84;
 
@@ -11,6 +10,7 @@ export function PianoRoll() {
   const { project, currentTrackIndex, selectedNotes, selectNote, addNote, clearSelection } = useProjectStore();
   const track = project.tracks[currentTrackIndex];
   const [scrollX, setScrollX] = useState(0);
+  const [tickWidth, setTickWidth] = useState(0.5);
   
   const render = useCallback(() => {
     const canvas = canvasRef.current;
@@ -32,7 +32,6 @@ export function PianoRoll() {
       ctx.fillStyle = isBlack ? '#2a2a2a' : '#252525';
       ctx.fillRect(0, y, width, NOTE_HEIGHT);
       
-      // Labels
       if (p % 12 === 0 || p % 12 === 5) {
         ctx.fillStyle = '#666';
         ctx.font = '10px monospace';
@@ -46,7 +45,7 @@ export function PianoRoll() {
     const totalTicks = Math.max(2000, ...track.notes.map(n => n.start + n.duration));
     
     for (let t = 0; t <= totalTicks; t += ticksPerBeat) {
-      const x = t * TICK_WIDTH - scrollX;
+      const x = t * tickWidth - scrollX;
       if (x < 0 || x > width) continue;
       ctx.strokeStyle = t % ticksPerBar === 0 ? '#444' : '#333';
       ctx.beginPath();
@@ -57,9 +56,9 @@ export function PianoRoll() {
     
     // Notes
     track.notes.forEach((note, i) => {
-      const x = note.start * TICK_WIDTH - scrollX;
+      const x = note.start * tickWidth - scrollX;
       const y = 24 + (MAX_PITCH - note.pitch) * NOTE_HEIGHT;
-      const w = note.duration * TICK_WIDTH;
+      const w = note.duration * tickWidth;
       
       if (x + w < 0 || x > width) return;
       
@@ -77,7 +76,7 @@ export function PianoRoll() {
         ctx.stroke();
       }
     });
-  }, [track, selectedNotes, scrollX, project.beatPerBar]);
+  }, [track, selectedNotes, scrollX, tickWidth, project.beatPerBar]);
   
   useEffect(() => {
     render();
@@ -93,9 +92,8 @@ export function PianoRoll() {
     if (y < 0) return;
     
     const pitch = MAX_PITCH - Math.floor(y / NOTE_HEIGHT);
-    const start = Math.floor(x / TICK_WIDTH / 10) * 10;
+    const start = Math.floor(x / tickWidth / 10) * 10;
     
-    // Check if clicked on existing note
     const clickedIndex = track.notes.findIndex(
       n => pitch === n.pitch && start >= n.start && start < n.start + n.duration
     );
@@ -117,7 +115,7 @@ export function PianoRoll() {
     if (y < 0) return;
     
     const pitch = MAX_PITCH - Math.floor(y / NOTE_HEIGHT);
-    const start = Math.floor(x / TICK_WIDTH / 10) * 10;
+    const start = Math.floor(x / tickWidth / 10) * 10;
     
     if (pitch >= MIN_PITCH && pitch <= MAX_PITCH && start >= 0) {
       addNote(currentTrackIndex, { pitch, velocity: 100, start, duration: 480 });
@@ -125,17 +123,23 @@ export function PianoRoll() {
   };
   
   const handleWheel = (e: React.WheelEvent) => {
-    if (e.shiftKey) {
+    if (e.ctrlKey) {
+      e.preventDefault();
+      // Zoom
+      const delta = e.deltaY > 0 ? -0.1 : 0.1;
+      setTickWidth(prev => Math.max(0.1, Math.min(2, prev + delta)));
+    } else if (e.shiftKey) {
       setScrollX(prev => Math.max(0, prev - e.deltaY));
     }
   };
   
   return (
-    <div className="flex-1 overflow-hidden bg-gray-800">
-      <div className="h-6 bg-gray-700 border-b border-gray-600 flex items-center px-2">
+    <div className="flex-1 overflow-hidden bg-gray-800 flex flex-col">
+      <div className="h-6 bg-gray-700 border-b border-gray-600 flex items-center justify-between px-2">
         <span className="text-xs text-gray-400">Piano Roll - {track.name}</span>
+        <span className="text-xs text-gray-500">Zoom: {Math.round(tickWidth * 100)}% | Scroll: Shift+Wheel</span>
       </div>
-      <div className="overflow-auto h-[calc(100%-24px)]">
+      <div className="overflow-auto flex-1">
         <canvas
           ref={canvasRef}
           width={1400}
