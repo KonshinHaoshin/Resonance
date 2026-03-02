@@ -74,15 +74,8 @@ export function PianoRoll() {
     }
   }, [currentTick, isPlaying, autoScroll, tickWidth, scrollX]);
 
-  // Snap to grid
-  const snapToGrid = useCallback((tick: number) => {
-    if (!snapEnabled) return tick;
-    const snapTicks = 120; // 16th note
-    return Math.round(tick / snapTicks) * snapTicks;
-  }, [snapEnabled]);
-
-  // Convert position to grid coordinates
-  const getGridPosition = useCallback((clientX: number, clientY: number) => {
+  // Render minimap
+  const renderMinimap = useCallback(() => {
     const canvas = minimapRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -138,7 +131,7 @@ export function PianoRoll() {
         console.log('Backend not ready or error:', err);
       });
   }, []);
-=======
+
   // Snap to grid
   const snapToGrid = useCallback((tick: number) => {
     if (!snapEnabled) return tick;
@@ -187,7 +180,6 @@ export function PianoRoll() {
     }
     return null;
   }, [track.notes, scrollX, tickWidth, getGridPosition]);
->>>>>>> c3ef37e406b13d04d2ace1e7670ddaf9a673c580
 
   const render = useCallback(() => {
     const canvas = canvasRef.current;
