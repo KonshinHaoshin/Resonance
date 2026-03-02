@@ -44,9 +44,16 @@ https://github.com/Akanclaw/Resonance
 - [x] Timeline 时间轴
 
 ### Phase 5: 播放控制 & 渲染
-- [ ] 音频播放 (rodio)
+- [x] 音频引擎重构
+- [x] 项目渲染到音频缓冲区
+- [x] 获取音频样本命令
+- [ ] 前端 Web Audio API 集成
 - [ ] 实时预览
-- [ ] 渲染管线
+
+### Phase 6: Resampler 接口
+- [ ] Resampler trait 定义
+- [ ] 内置 WORLDLINE
+- [ ] 外部 resampler 支持
 
 ### Phase 6: Resampler 接口
 - [ ] Resampler trait 定义
