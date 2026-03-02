@@ -57,9 +57,10 @@ https://github.com/Akanclaw/Resonance
 - [ ] 外部 resampler 支持
 
 ### Phase 7: Phonemizer 插件
-- [ ] 插件系统架构
-- [ ] 内置 phonemizers
-- [ ] 第三方扩展支持
+- [x] 插件系统架构
+- [x] 内置 JapanesePhonemizer (带假名词典)
+- [x] 内置 EnglishArpabetPhonemizer (带英语词典)
+- [x] PhonemizerManager 管理器
 
 ---
 
