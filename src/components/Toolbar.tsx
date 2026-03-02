@@ -24,6 +24,7 @@ import { MasterVolume } from './MasterVolume';
 import { ThemeToggle } from './ThemeToggle';
 import { ExportMenu } from './ExportMenu';
 import { MIDIMonitor } from './MIDIMonitor';
+import { VocalMode } from './VocalMode';
 
 export function Toolbar() {
   const { isPlaying, setPlaying, project, setProject, undo, redo, canUndo, canRedo } = useProjectStore();
@@ -143,6 +144,7 @@ export function Toolbar() {
       <NoteLengthSelector />
       <OctaveShift />
       <VelocitySlider />
+      <VocalMode />
       <Metronome />
       <GridSelector />
       <TransposeTool />

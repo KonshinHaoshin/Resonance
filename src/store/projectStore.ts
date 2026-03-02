@@ -6,6 +6,8 @@ interface HistoryState {
   future: Project[];
 }
 
+type VocalMode = 'CV' | 'VCV' | 'VC';
+
 interface ProjectState {
   project: Project;
   currentTrackIndex: number;
@@ -13,6 +15,7 @@ interface ProjectState {
   isPlaying: boolean;
   currentTick: number;
   history: HistoryState;
+  vocalMode: VocalMode;
   setProject: (project: Project) => void;
   setCurrentTrack: (index: number) => void;
   addTrack: (track: Track) => void;
@@ -23,6 +26,7 @@ interface ProjectState {
   selectNote: (noteIndex: number) => void;
   clearSelection: () => void;
   setCurrentTick: (tick: number) => void;
+  setVocalMode: (mode: VocalMode) => void;
   undo: () => void;
   redo: () => void;
   canUndo: () => boolean;
@@ -47,6 +51,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   isPlaying: false,
   currentTick: 0,
   history: { past: [], future: [] },
+  vocalMode: 'CV',
   
   setProject: (project) => set({ project }),
   
@@ -105,6 +110,8 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   clearSelection: () => set({ selectedNotes: [] }),
   
   setCurrentTick: (tick) => set({ currentTick: tick }),
+  
+  setVocalMode: (mode) => set({ vocalMode: mode }),
   
   undo: () => set((state) => {
     if (state.history.past.length === 0) return state;
