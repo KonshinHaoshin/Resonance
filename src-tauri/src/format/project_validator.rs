@@ -231,3 +231,121 @@ impl ProjectValidator {
 
                 // Check if same pitch and overlapping
                 if note1.pitch == note2.pitch {
+                    // Notes overlap in time
+                    let note1_end = note1.position + note1.duration;
+                    let note2_end = note2.position + note2.duration;
+                    
+                    if note1.position < note2_end && note2.position < note1_end {
+                        result.add_warning(format!(
+                            "Track '{}' has overlapping notes at pitch {} (positions {} and {})",
+                            track_name, note1.pitch, note1.position, note2.position));
+                    }
+                }
+            }
+        }
+    }
+
+    /// Validate project integrity
+    fn validate_integrity(&self, project: &UstxFile, result: &mut ValidationResult) {
+        // Check for orphan notes (notes not aligned to beat)
+        for (track_idx, track) in project.tracks.iter().enumerate() {
+            for note in &track.notes {
+                // Check if note position is reasonable
+                if note.position > 10000000 {
+                    result.add_warning(format!(
+                        "Track {} note at position {} is very far from start",
+                        track_idx, note.position));
+                }
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::format::ustx::{UstxFile, TrackData, NoteData};
+
+    fn create_test_project() -> UstxFile {
+        UstxFile {
+            name: "Test Project".to_string(),
+            bpm: 120.0,
+            ..Default::default()
+        }
+    }
+
+    #[test]
+    fn test_empty_project() {
+        let project = create_test_project();
+        let validator = ProjectValidator::new();
+        let result = validator.validate(&project);
+        
+        assert!(!result.is_valid());
+        assert!(!result.errors.is_empty());
+    }
+
+    #[test]
+    fn test_valid_project() {
+        let mut project = create_test_project();
+        project.tracks.push(TrackData {
+            name: "Test Track".to_string(),
+            notes: vec![
+                NoteData {
+                    position: 0,
+                    duration: 480,
+                    pitch: 60,
+                    velocity: 100,
+                    ..Default::default()
+                }
+            ],
+            ..Default::default()
+        });
+        
+        let validator = ProjectValidator::new();
+        let result = validator.validate(&project);
+        
+        assert!(result.is_valid(), "Expected valid project but got errors: {:?}", result.errors);
+    }
+
+    #[test]
+    fn test_invalid_bpm() {
+        let mut project = create_test_project();
+        project.bpm = 0.0;
+        
+        let validator = ProjectValidator::new();
+        let result = validator.validate(&project);
+        
+        assert!(!result.is_valid());
+    }
+
+    #[test]
+    fn test_note_overlap_warning() {
+        let mut project = create_test_project();
+        project.tracks.push(TrackData {
+            name: "Test Track".to_string(),
+            notes: vec![
+                NoteData {
+                    position: 0,
+                    duration: 480,
+                    pitch: 60,
+                    velocity: 100,
+                    ..Default::default()
+                },
+                NoteData {
+                    position: 240,
+                    duration: 480,
+                    pitch: 60,
+                    velocity: 100,
+                    ..Default::default()
+                }
+            ],
+            ..Default::default()
+        });
+        
+        let validator = ProjectValidator::new();
+        let result = validator.validate(&project);
+        
+        // Should have warning about overlap
+        assert!(!result.warnings.is_empty());
+    }
+}

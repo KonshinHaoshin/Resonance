@@ -150,7 +150,7 @@ pub fn read_wav(path: &Path) -> Result<WavAudio, WavError> {
         if data_offset > 0 && sample_rate > 0 {
             // Try to continue reading to find end of data chunk
             let current_pos = file.stream_position()?;
-            if current_pos >= data_offset + data_size {
+            if current_pos >= (data_offset + data_size) as u64 {
                 break;
             }
         }
