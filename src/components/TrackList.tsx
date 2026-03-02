@@ -8,7 +8,7 @@ export function TrackList() {
     <div className="w-48 bg-gray-900 border-r border-gray-700 flex flex-col">
       <div className="flex items-center justify-between px-3 py-2 border-b border-gray-700">
         <span className="text-gray-300 text-sm font-medium">Tracks</span>
-        <button onClick={() => addTrack({ name: `Track ${project.tracks.length + 1}`, notes: [] })} className="text-gray-400 hover:text-white">+</button>
+        <button onClick={() => addTrack({ name: `Track ${project.tracks.length + 1}`, notes: [], volume: 0.8, pan: 0, effects: [] })} className="text-gray-400 hover:text-white">+</button>
       </div>
       {project.tracks.map((track, i) => (
         <button

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
-import { Toolbar, TrackList, PianoRoll, NoteProperties, Timeline, StatusBar, TransportBar, AudioPlayer } from "./components";
+import { Toolbar, TrackList, PianoRoll, NoteProperties, Timeline, StatusBar, TransportBar, AudioPlayer, Mixer, EffectRack } from "./components";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 import "./App.css";
 
@@ -31,6 +31,8 @@ function App() {
         </div>
         <NoteProperties />
       </div>
+      <Mixer />
+      <EffectRack />
       <StatusBar />
     </div>
   );

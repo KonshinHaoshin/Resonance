@@ -12,6 +12,7 @@ use midi::Note;
 use format::UstxFile;
 use format::ustx::{TrackData, NoteData};
 use format::render::{RenderFormat, RenderConfig, AudioRenderer, start_render as start_render_impl, cancel_render as cancel_render_impl, get_render_progress as get_render_progress_impl};
+use format::wav::{read_wav, write_wav, export_audio_buffer, WavAudio, WavSpec, WavError};
 use plugin::resampler::{Resampler, builtin::WorldlineResampler};
 use std::sync::{Mutex, Arc};
 use once_cell::sync::Lazy;
@@ -361,6 +362,144 @@ fn test_resampler() -> Result<String, String> {
     Ok(format!("Resampler generated {} samples", buffer.len()))
 }
 
+// ============================================================================
+// WAV Import/Export Commands
+// ============================================================================
+
+/// Import WAV audio file
+#[tauri::command]
+fn import_wav(path: String) -> Result<String, String> {
+    info!("Importing WAV file: {}", path);
+    let path_ref = std::path::Path::new(&path);
+    let audio = read_wav(path_ref).map_err(|e| {
+        error!("Failed to import WAV: {}", e);
+        e.to_string()
+    })?;
+    
+    info!("Imported WAV: {}Hz, {} channels, {} bits, {:.2}s", 
+        audio.spec.sample_rate, 
+        audio.spec.channels, 
+        audio.spec.bits_per_sample,
+        audio.duration());
+    
+    Ok(format!(
+        "{{\"sampleRate\": {}, \"channels\": {}, \"bitsPerSample\": {}, \"duration\": {:.3}, \"samples\": {}}}",
+        audio.spec.sample_rate,
+        audio.spec.channels,
+        audio.spec.bits_per_sample,
+        audio.duration(),
+        audio.len()
+    ))
+}
+
+/// Export audio buffer to WAV file
+#[tauri::command]
+fn export_wav(path: String, sample_rate: u32, channels: u16) -> Result<String, String> {
+    info!("Exporting WAV file: {}", path);
+    
+    let path_ref = std::path::Path::new(&path);
+    
+    // Get samples from audio engine
+    let engine = AUDIO_ENGINE.lock().map_err(|e| e.to_string())?;
+    let samples = engine.get_samples();
+    
+    if samples.is_empty() {
+        return Err("No audio samples to export".to_string());
+    }
+    
+    export_audio_buffer(path_ref, &samples, sample_rate, channels).map_err(|e| {
+        error!("Failed to export WAV: {}", e);
+        e.to_string()
+    })?;
+    
+    info!("Exported {} samples to WAV", samples.len() / channels as usize);
+    Ok(format!("Exported to {}", path))
+}
+
+/// Export rendered project directly to WAV
+#[tauri::command]
+fn export_project_wav(
+    project: UstxFile,
+    output_path: String,
+    sample_rate: u32,
+    channels: u16,
+    bit_depth: u16,
+) -> Result<String, String> {
+    info!("Exporting project to WAV: {}", output_path);
+    
+    // First render the project
+    let engine = AUDIO_ENGINE.lock().map_err(|e| e.to_string())?;
+    engine.clear_buffer();
+    
+    // Generate audio from project notes
+    let resampler = WorldlineResampler::new(sample_rate);
+    
+    let mut total_samples = 0usize;
+    
+    for track in &project.tracks {
+        for note in &track.notes {
+            let note_names = ["c", "d", "e", "f", "g", "a", "b"];
+            let octave = (note.pitch / 12) - 1;
+            let note_idx = note.pitch % 12;
+            let note_name = format!("{}{}", note_names[(note_idx as usize) % 7], octave);
+            
+            let buffer = resampler.resample(&note_name, note.pitch as u8, note.velocity as u8, note.duration);
+            let note_samples = buffer.to_vec();
+            total_samples += note_samples.len();
+            
+            for chunk in note_samples.chunks(2) {
+                if chunk.len() == 2 {
+                    engine.add_samples(chunk[0], chunk[1]);
+                } else if chunk.len() == 1 {
+                    engine.add_sample(chunk[0]);
+                }
+            }
+        }
+    }
+    drop(engine);
+    
+    // Now export
+    let engine = AUDIO_ENGINE.lock().map_err(|e| e.to_string())?;
+    let samples = engine.get_samples();
+    
+    let path_ref = std::path::Path::new(&output_path);
+    
+    // Use write_wav with specified bit depth
+    let spec = WavSpec {
+        sample_rate,
+        channels,
+        bits_per_sample: bit_depth,
+    };
+    let audio = WavAudio {
+        spec,
+        data: samples,
+    };
+    
+    write_wav(path_ref, &audio).map_err(|e| {
+        error!("Failed to export WAV: {}", e);
+        e.to_string()
+    })?;
+    
+    info!("Exported {} samples to WAV: {}", total_samples, output_path);
+    Ok(format!("Exported to {}", output_path))
+}
+
+/// Get WAV file info without loading full audio
+#[tauri::command]
+fn get_wav_info(path: String) -> Result<String, String> {
+    let path_ref = std::path::Path::new(&path);
+    let audio = read_wav(path_ref).map_err(|e| e.to_string())?;
+    
+    Ok(format!(
+        "{{\"sampleRate\": {}, \"channels\": {}, \"bitsPerSample\": {}, \"duration\": {:.3}, \"samples\": {}}}",
+        audio.spec.sample_rate,
+        audio.spec.channels,
+        audio.spec.bits_per_sample,
+        audio.duration(),
+        audio.len()
+    ))
+}
+
 /// Get app version
 #[tauri::command]
 fn get_version() -> String {
@@ -416,6 +555,11 @@ pub fn run() {
             create_note,
             test_resampler,
             get_version,
+            // WAV import/export commands
+            import_wav,
+            export_wav,
+            export_project_wav,
+            get_wav_info,
             format::io::load_ustx_file,
             format::io::save_ustx_file,
             format::io::create_new_project,

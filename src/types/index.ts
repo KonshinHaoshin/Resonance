@@ -7,10 +7,20 @@ export interface Note {
   duration: number;
 }
 
+export interface Effect {
+  id: string;
+  type: 'reverb' | 'delay' | 'eq' | 'chorus';
+  enabled: boolean;
+  params: Record<string, number>;
+}
+
 export interface Track {
   name: string;
   color?: string;
   notes: Note[];
+  volume: number;
+  pan: number;
+  effects: Effect[];
 }
 
 export interface Tempo {

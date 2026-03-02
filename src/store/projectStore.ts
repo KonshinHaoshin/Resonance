@@ -19,6 +19,7 @@ interface ProjectState {
   setProject: (project: Project) => void;
   setCurrentTrack: (index: number) => void;
   addTrack: (track: Track) => void;
+  updateTrack: (index: number, updates: Partial<Track>) => void;
   addNote: (trackIndex: number, note: Note) => void;
   updateNote: (trackIndex: number, noteIndex: number, note: Partial<Note>) => void;
   deleteNote: (trackIndex: number, noteIndex: number) => void;
@@ -39,7 +40,7 @@ const defaultProject: Project = {
   beatPerBar: 4,
   beatUnit: 4,
   tempo: [{ position: 0, bpm: 120 }],
-  tracks: [{ name: 'Track 1', notes: [] }]
+  tracks: [{ name: 'Track 1', notes: [], volume: 0.8, pan: 0, effects: [] }]
 };
 
 const MAX_HISTORY = 50;
@@ -59,6 +60,16 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   
   addTrack: (track) => set((state) => {
     const newProject = { ...state.project, tracks: [...state.project.tracks, track] };
+    return {
+      project: newProject,
+      history: { past: [...state.history.past.slice(-MAX_HISTORY + 1), state.project], future: [] }
+    };
+  }),
+  
+  updateTrack: (trackIndex, trackUpdates) => set((state) => {
+    const tracks = [...state.project.tracks];
+    tracks[trackIndex] = { ...tracks[trackIndex], ...trackUpdates };
+    const newProject = { ...state.project, tracks };
     return {
       project: newProject,
       history: { past: [...state.history.past.slice(-MAX_HISTORY + 1), state.project], future: [] }
