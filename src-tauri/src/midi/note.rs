@@ -1,5 +1,7 @@
+use serde::{Serialize, Deserialize};
+
 /// MIDI Note representation
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub struct Note {
     /// MIDI note number (0-127)
     pub pitch: u8,

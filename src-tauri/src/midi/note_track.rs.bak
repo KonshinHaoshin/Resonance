@@ -306,5 +306,3 @@ impl NoteTrack {
 
 // Re-export for convenience
 pub use super::note::Note as MidiNote;
-pub use NoteClipboard;
-pub use NoteClipboardItem;

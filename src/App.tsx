@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
-import { Toolbar, TrackList, PianoRoll, NoteProperties, Timeline, StatusBar } from "./components";
+import { Toolbar, TrackList, PianoRoll, NoteProperties, Timeline, StatusBar, TransportBar, AudioPlayer } from "./components";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 import "./App.css";
 
@@ -19,10 +19,16 @@ function App() {
         <span className="text-sm font-medium">Resonance {version && `v${version}`}</span>
       </div>
       <Toolbar />
+      <TransportBar />
       <Timeline />
       <div className="flex-1 flex overflow-hidden">
         <TrackList />
-        <PianoRoll />
+        <div className="flex-1 flex flex-col">
+          <PianoRoll />
+          <div className="p-4 border-t border-gray-700">
+            <AudioPlayer />
+          </div>
+        </div>
         <NoteProperties />
       </div>
       <StatusBar />
