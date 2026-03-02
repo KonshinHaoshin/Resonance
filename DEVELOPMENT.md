@@ -47,8 +47,9 @@ https://github.com/Akanclaw/Resonance
 - [x] 音频引擎重构
 - [x] 项目渲染到音频缓冲区
 - [x] 获取音频样本命令
-- [ ] 前端 Web Audio API 集成
-- [ ] 实时预览
+- [x] 前端 Web Audio API 集成
+- [x] TransportBar 播放控制
+- [x] AudioPlayer 组件
 
 ### Phase 6: Resampler 接口
 - [x] Resampler trait 定义
