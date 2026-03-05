@@ -362,6 +362,13 @@ impl Resampler for ExternalResampler {
         velocity: u8,
         duration: u64,
     ) -> AudioBuffer {
+        // Validate phoneme to prevent command injection
+        // Only allow alphanumeric characters, hyphens, underscores, max 64 chars
+        if phoneme.len() > 64 || !phoneme.chars().all(|c| c.is_alphanumeric() || c == '-' || c == '_') {
+            log::warn!("Invalid phoneme parameter, using default");
+            return AudioBuffer::new(self.sample_rate, 2);
+        }
+
         // Build command
         let mut cmd = Command::new(&self.path);
         
