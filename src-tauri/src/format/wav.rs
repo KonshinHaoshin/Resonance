@@ -7,6 +7,9 @@ use std::io::{Read, Write, Seek, SeekFrom};
 use std::path::Path;
 use thiserror::Error;
 
+/// Maximum allowed WAV file size (100 MB)
+const MAX_WAV_SIZE: u64 = 100 * 1024 * 1024;
+
 #[derive(Error, Debug)]
 pub enum WavError {
     #[error("Failed to open file: {0}")]
@@ -19,6 +22,10 @@ pub enum WavError {
     IoError(#[from] std::io::Error),
     #[error("Invalid sample rate: {0}")]
     InvalidSampleRate(u32),
+    #[error("File too large: {0} bytes (max: {MAX_WAV_SIZE})")]
+    FileTooLarge(usize),
+    #[error("Invalid bits per sample: {0}")]
+    InvalidBitsPerSample(u16),
 }
 
 /// WAV file format specifications
@@ -159,6 +166,16 @@ pub fn read_wav(path: &Path) -> Result<WavAudio, WavError> {
     // Validate
     if sample_rate == 0 {
         return Err(WavError::InvalidSampleRate(sample_rate));
+    }
+
+    // Validate bits_per_sample
+    if bits_per_sample == 0 || bits_per_sample % 8 != 0 {
+        return Err(WavError::InvalidBitsPerSample(bits_per_sample));
+    }
+
+    // Validate file size to prevent memory exhaustion
+    if data_size > MAX_WAV_SIZE as usize {
+        return Err(WavError::FileTooLarge(data_size));
     }
 
     // Read actual audio data
