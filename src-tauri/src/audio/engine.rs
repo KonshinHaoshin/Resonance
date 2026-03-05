@@ -190,7 +190,13 @@ impl AudioEngine {
     /// Generate test tone (sine wave)
     pub fn generate_test_tone(&self, frequency: f32, duration_secs: f32) {
         let sample_count = (self.sample_rate as f32 * duration_secs) as usize;
-        let mut buffer = self.buffer.lock().unwrap();
+        let mut buffer = match self.buffer.lock() {
+            Ok(b) => b,
+            Err(e) => {
+                log::error!("Failed to lock audio buffer: {}", e);
+                return;
+            }
+        };
         
         for i in 0..sample_count {
             let t = i as f32 / self.sample_rate as f32;
